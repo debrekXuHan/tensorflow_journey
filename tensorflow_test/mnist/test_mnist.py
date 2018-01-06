@@ -49,7 +49,7 @@ if __name__ == "__main__":
     img_file = 'MNIST_data/train-images.idx3-ubyte'
     label_file = 'MNIST_data/train-labels.idx1-ubyte'
 
-    index = 120
+    index = 0
 
     # print the label of a certain data by index
     labels, labels_head = loadLabelSet(label_file)
