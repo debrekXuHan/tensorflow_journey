@@ -15,5 +15,7 @@ Use the MNIST Dataset to build tensorflow model.
 In this demo, I input the image data and the label data. Then try to print out the label and show the image by a certain index.<br>
 * input_data.py<br>
 By using the method 'read_data_sets', we can divide the dataset into: `mnist.train.images`, `mnist.train.labels`, `mnist.test.images`, `mnist.test.labels`.<br>
-* main_mnist.py<br>
-Use TensorFlow to train different models that can recognize the image and check the accuracy of the models.<br>
+* main_mnist_1.py<br>
+Use TensorFlow to train a Softmax Model for MNIST dataset and check the model accuracy using the testing data.<br>
+* main_mnist_2.py<br>
+Use TensorFlow to train a neural network model and optimize with Adam Optimizer.<br>
