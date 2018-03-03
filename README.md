@@ -13,9 +13,11 @@ Use TensorFlow to fit a linear plane.
 Use the MNIST Dataset to build tensorflow model.
 * test_mnist.py<br>
 In this demo, I input the image data and the label data. Then try to print out the label and show the image by a certain index.<br>
+* main.py<br>
+Main function file.<br>
 * input_data.py<br>
 By using the method 'read_data_sets', we can divide the dataset into: `mnist.train.images`, `mnist.train.labels`, `mnist.test.images`, `mnist.test.labels`.<br>
-* main_mnist_1.py<br>
+* mnist_softmax.py<br>
 Use TensorFlow to train a Softmax Model for MNIST dataset and check the model accuracy using the testing data.<br>
-* main_mnist_2.py<br>
+* mnist_conv_nn.py<br>
 Use TensorFlow to train a neural network model and optimize with Adam Optimizer.<br>
