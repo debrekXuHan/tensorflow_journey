@@ -23,5 +23,5 @@ Use TensorFlow to train a Softmax Model for MNIST dataset and check the model ac
 Use TensorFlow to train a neural network model and optimize with Adam Optimizer.<br>
 
 ## oct_unet
-Use the dataset from AI Challenge 2018: https://challenger.ai/competition/fl2018
+Use the dataset from AI Challenge 2018: https://challenger.ai/competition/fl2018 <br>
 Use U-Net to train the a medical image segmentation neural network.
