@@ -25,3 +25,6 @@ Use TensorFlow to train a neural network model and optimize with Adam Optimizer.
 ## oct_unet
 Use the dataset from AI Challenge 2018: https://challenger.ai/competition/fl2018 <br>
 Use U-Net to train the a medical image segmentation neural network.
+
+## data_prediction
+We have some optical data from kindergarten and use the Lightgbm to train a model to give out optical diagnosis.
