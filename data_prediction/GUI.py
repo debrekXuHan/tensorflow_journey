@@ -76,11 +76,21 @@ class data_prediction:
         button.pack(side = 'left', padx = 10)
         self.text = tk.Text(frm3, width = 20, height = 2)
         self.text.pack(side = 'left', padx = 10)
+
+        #--- Frame 4: Give out the suggestion
+        frm4 = tk.Frame(master)
+        frm4.pack(fill = 'x')
+        label_sg = tk.Label(frm4, text = '治疗建议', height = 2)
+        label_sg.pack(side = 'left', padx = 10)
+        self.text1 = tk.Text(frm4, width = 30, height = 2)
+        self.text1.pack(side = 'left', padx = 10)
+
         #--- load pre-trained model
         self.clf = joblib.load("train_model.m")
 
     def show_result(self):
         self.text.delete(0.0, 'end')
+        self.text1.delete(0.0, 'end')
         r_v = self.entry_r_v.get()
         l_v = self.entry_l_v.get()
         r_s = self.entry_r_s.get()
@@ -118,6 +128,10 @@ class data_prediction:
                 result = str(self.clf.predict(data))[2:-2]
                 print(result)
                 self.text.insert('insert', result)
+                if '正常' == result:
+                    self.text1.insert('insert', '坚持近视防控活动有助于预防视力问题的发生')
+                else:
+                    self.text1.insert('insert', '请前往医院进行散瞳验光检查')
             except Exception as e:
                 print('error value: ', str(e))
                 self.text.insert('insert', 'Oops, ERROR!')
