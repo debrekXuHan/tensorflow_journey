@@ -32,3 +32,6 @@ We have some optical data from kindergarten and use the Lightgbm to train a mode
 ## cats_n_dogs
 I used the fine-tuning method with pre-trained ResNet50, InceptionV3 and Xception. Neural Network weights are trained from Imagenet.<br>
 The dataset is from Kaggle: https://www.kaggle.com/c/dogs-vs-cats-redux-kernels-edition/data 
+
+## mask_rcnn
+pre-trained model download:  [mask_rcnn_coco.h5](https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5)
