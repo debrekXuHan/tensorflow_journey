@@ -2,10 +2,26 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+from mrcnn.config import Config
+from mrcnn import model as modellib, utils
 
 ROOT_DIR = sys.path[0]
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, 'logs')
 BALLOON_DATA = os.path.join(ROOT_DIR, 'balloon')
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+
+class BalloonConfig(Config):
+    # give the configuration a recognized name
+    NAME = "balloon"
+
+    # use GTX1080Ti, which can fit two images
+    IMAGES_PER_GPU = 2
+
+    # number of training steps per epoch
+    STEPS_PER_EPOCH = 100
+
+    # skip detection with < 90% confidence
+    DETECTION_MIN_CONFIDENCE = 0.9
 
 if __name__ == "__main__":
     import argparse
@@ -47,3 +63,49 @@ if __name__ == "__main__":
     print("weights: ", args.weights)
     print("dataset: ", args.dataset)
     print("logs: ", args.logs)
+
+    if args.command == "train":
+        config = BalloonConfig()
+    else:
+        class InferenceConfig(BalloonConfig):
+            # set batch size to 1 since we'll be running inference on
+            # one image at a time. batch size = GPU_COUNT * IMAGES_PER_GPU
+            GPU_COUNT = 1
+            IMAGES_PER_GPU = 1
+        config = InferenceConfig()
+    config.display()
+
+    # create model
+    if args.command == "train":
+        model = modellib.MaskRCNN(mode="training", config=config,
+                                  model_dir=args.logs)
+    else:
+        model = modellib.MaskRCNN(mode="inference", config=config,
+                                  model_dir=args.logs)
+
+    # select weights file to load
+    if args.weights.lower() == "coco":
+        weights_path = COCO_MODEL_PATH
+        # download weights file
+        if not os.path.exists(weights_path):
+            utils.download_trained_weights(weights_path)
+    elif args.weights.lower() == "last":
+        # find last trained weights
+        weights_path = model.find_last()
+    elif args.weights.lower() == "imagenet":
+        # start from ImageNet trained weights
+        weights_path = model.get_imagenet_weights()
+    else:
+        weights_path = args.weights
+
+    # load weights
+    print("Loading weights ", weights_path)
+    if args.weights.lower() == "coco":
+        # exclude the last layers because they require a matching number of classes
+        model.load_weights(weights_path, by_name=True, exclude=[
+            "mrcnn_class_logits", "mrcnn_bbox_fc",
+            "mrcnn_bbox", "mrcnn_mask"])
+    else:
+        model.load_weights(weights_path, by_name=True)
+
+    # train or evaluate
