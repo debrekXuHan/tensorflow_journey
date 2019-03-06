@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+import json
+
+import skimage
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 
@@ -36,7 +39,29 @@ class BalloonDataset(utils.Dataset):
         dataset_dir = os.path.join(dataset_dir, subset)
 
         # load annotations
-        
+        annotations = json.load(open(os.path.join(dataset_dir, "via_region_data.json")))
+        annotations = list(annotations.values())  # don't need the keys
+        annotations = [a for a in annotations if a['regions']]  # eliminate un-annotated images
+
+        # add images
+        for a in annotations:
+            if type(a['regions']) is dict:
+                polygons = [r['shape_attributes'] for r in a['regions'].values()]
+            else:
+                polygons = [r['shape_attributes'] for r in a['regions']]
+
+            image_path = os.path.join(dataset_dir, a['filename'])
+            image = skimage.io.imread(image_path)
+            height, width = image.shape[:2]
+
+            self.add_image(
+                source="balloon",
+                image_id=a['filename'],
+                path=image_path,
+                width=width, height=height,
+                polygons=polygons
+            )
+
 
 def train(model):
     # training dataset
