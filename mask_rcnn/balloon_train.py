@@ -23,6 +23,26 @@ class BalloonConfig(Config):
     # skip detection with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
 
+##################################
+#  Dataset Class
+##################################
+class BalloonDataset(utils.Dataset):
+    def load_balloon(self, dataset_dir, subset):
+        # add class (we have only one class to add)
+        self.add_class("balloon", 1, "balloon")
+
+        # train or validation dataset
+        assert subset in ["train", "val"]
+        dataset_dir = os.path.join(dataset_dir, subset)
+
+        # load annotations
+        
+
+def train(model):
+    # training dataset
+    dataset_train = BalloonDataset()
+    dataset_train.load_balloon(args.dataset, "train")
+
 if __name__ == "__main__":
     import argparse
 
@@ -37,6 +57,7 @@ if __name__ == "__main__":
                         metavar="/path/to/balloon/dataset",
                         help="directory of the Balloon dataset")
     parser.add_argument("--weights", required=False,
+                        default="coco",
                         metavar="/path/to/weights.h5",
                         help="path to weights .h5 file or 'coco'")
     parser.add_argument("--logs", required=False,
@@ -109,3 +130,5 @@ if __name__ == "__main__":
         model.load_weights(weights_path, by_name=True)
 
     # train or evaluate
+    if args.command == "train":
+        train(model)
