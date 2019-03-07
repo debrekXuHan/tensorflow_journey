@@ -3,6 +3,7 @@
 import sys
 import os
 import json
+import numpy as np
 
 import skimage
 from mrcnn.config import Config
@@ -62,11 +63,51 @@ class BalloonDataset(utils.Dataset):
                 polygons=polygons
             )
 
+    def load_mask(self, image_id):
+        """Generate instance masks for an image.
+        Returns:
+        masks: a bool array of shape [height, width, instance count] with
+               one mask per instance.
+        class_ids: a 1D array of class IDs of the instance masks.
+        """
+        image_info = self.image_info[image_id]
+
+        # if not a balloon dataset image, delegate it
+        if image_info['source'] != "balloon":
+            return super(self.__class__, self).load_mask(image_id)
+
+        # convert polygons to a bitmap mask of shape
+        # [height, width, instance_count]
+        mask = np.zeros([image_info['height'], image_info['width'], len(image_info['polygons'])],
+                        dtype=np.uint8)
+        for i, p in enumerate(image_info['polygons']):
+            # get position of pixels inside the polygon and set them to 1
+            rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
+            mask[rr, cc, i] = 1
+
+        # Return mask, and array of class IDs of each instance.
+        # Since we have one class ID only, we return an array of 1s.
+        return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
+
+    def image_reference(self, image_id):
+        """ return the path of the image """
+        image_info = self.image_info[image_id]
+        if image_info['source'] == "balloon":
+            return image_info['path']
+        else:
+            return super(self.__class__, self).image_reference(image_id)
+
 
 def train(model):
     # training dataset
     dataset_train = BalloonDataset()
     dataset_train.load_balloon(args.dataset, "train")
+    dataset_train.prepare()
+
+    # validation dataset
+    dataset_val = BalloonDataset()
+    dataset_val.load_balloon(args.dataset, "val")
+    dataset_val.prepare()
 
 if __name__ == "__main__":
     import argparse
