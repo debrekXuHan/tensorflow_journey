@@ -4,8 +4,9 @@ import sys
 import os
 import json
 import numpy as np
-
+import datetime
 import skimage
+
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 
@@ -20,6 +21,9 @@ class BalloonConfig(Config):
 
     # use GTX1080Ti, which can fit two images
     IMAGES_PER_GPU = 2
+
+    # number of classes (including background)
+    NUM_CLASSES = 1 + 1
 
     # number of training steps per epoch
     STEPS_PER_EPOCH = 100
@@ -108,6 +112,53 @@ def train(model):
     dataset_val = BalloonDataset()
     dataset_val.load_balloon(args.dataset, "val")
     dataset_val.prepare()
+
+    # no need to train all layers, just the train the heads
+    print("Training network heads...")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=30,
+                layers='heads')
+
+def color_splash(image, mask):
+    """ color splash effect
+    [input]
+    image: RGB image on [height, width, 3]
+    mask: instance segmentation mask [height, width, instance_cnt]
+
+    [return]
+    result image
+    """
+    # make a grayscale copy of the image
+    gray = skimage.color.gray2rgb(skimage.color.rgb2gray(image)) * 255
+
+    # copy color pixels from original color image at mask area
+    if mask.shape[-1] > 0:
+        # collapse the mask into one layer
+        mask = (np.sum(mask, -1, keepdims=True) >= 1)
+        splash = np.where(mask, image, gray).astype(np.uint8)
+    else:
+        splash = gray.astype(np.uint8)
+    return splash
+
+def detect_and_color_splash(model, image_path=None, video_path=None):
+    assert image_path or video_path
+
+    # image or video?
+    if image_path:
+        print("Running on '{}'".format(image_path))
+        # read image
+        image = skimage.io.imread(image_path)
+        # detect balloons
+        result = model.detect([image], verbose=1)[0]
+        # color splash
+        splash = color_splash(image, result['masks'])
+        # save output
+        file_name = "splash_{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now())
+        print("Generating ", file_name)
+        skimage.io.imsave(file_name, splash)
+    elif video_path:
+        print("Running on '{}'".format(video_path))
 
 if __name__ == "__main__":
     import argparse
@@ -198,3 +249,10 @@ if __name__ == "__main__":
     # train or evaluate
     if args.command == "train":
         train(model)
+    elif args.command == "splash":
+        detect_and_color_splash(model,
+                                image_path=args.image,
+                                video_path=args.video)
+    else:
+        print("'{}' is not supported. "
+              "Please use 'train' or 'splash'.".format(args.command))
