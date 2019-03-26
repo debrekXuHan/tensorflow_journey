@@ -19,12 +19,12 @@ def loadImageSet(filename):
 
     bits = imgNum * width * height
     bitsString = '>' + str(bits) + 'B' # fmt format: '>47040000B'
-    
+
     imgs = struct.unpack_from(bitsString, buffers, offset)
 
     binfile.close()
     imgs = np.reshape(imgs, [imgNum, width * height]) # reshape into a [60000, 784] array
-    
+
     return imgs, head
 
 def loadLabelSet(filename):
@@ -37,12 +37,12 @@ def loadLabelSet(filename):
     offset = struct.calcsize('>II') # locate at the beginning of label data
     labelNum = head[1]
 
-    numString = '>' + str(labelNum) + 'B' # fmt format: '>60000B'  
+    numString = '>' + str(labelNum) + 'B' # fmt format: '>60000B'
     labels = struct.unpack_from(numString, buffers, offset)
 
     binfile.close()
     labels = np.reshape(labels, [labelNum]) # reshape into a [60000] array
-    
+
     return labels, head
 
 if __name__ == "__main__":
@@ -62,7 +62,6 @@ if __name__ == "__main__":
     imgs, imgs_head = loadImageSet(img_file)
     print('imgs_head: ', imgs_head)
     print(type(imgs))
-    fig = plt.figure()    
+    fig = plt.figure()
     plt.imshow(np.reshape(imgs[index, :], [28, 28]), cmap = 'binary') # display in black and white   
     plt.show()
-    
