@@ -36,24 +36,25 @@ model.add(MaxPooling2D(
     pool_size=2,
     strides=2,
     padding="same",
-    data_format="channels_first"
+    data_format="channels_first",
+    name="pool1"
 ))
 
 # Conv layer 2 output shape (64, 14, 14)
-model.add(Convolution2D(64, 5, strides=1, padding="same", data_format="channels_first"))
+model.add(Convolution2D(64, 5, strides=1, padding="same", data_format="channels_first", name="conv2"))
 model.add(Activation("relu"))
 
 # Pooling layer 2 (max pooling) output shape (64, 7, 7)
-model.add(MaxPooling2D(2, 2, "same", data_format="channels_first"))
+model.add(MaxPooling2D(2, 2, "same", data_format="channels_first", name="pool2"))
 
 # Fully Connected layer 1 input shape (64 * 7 * 7) = (3136), output shape (1024)
 model.add(Flatten())
-model.add(Dense(1024))
+model.add(Dense(1024, name="fc1"))
 model.add(Activation("relu"))
 
 # Fully Connected layer to shape (10) for 10 classes
-model.add(Dense(10))
-model.add(Activation("softmax"))
+model.add(Dense(10, name="fc2"))
+model.add(Activation("softmax", name="softmax"))
 
 # Adam optimizer
 adam = Adam(lr=1e-4)
