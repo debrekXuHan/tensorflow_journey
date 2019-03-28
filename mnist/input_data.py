@@ -130,7 +130,7 @@ class DataSet(object):
     end = self._index_in_epoch
     return self._images[start:end], self._labels[start:end]
 
-def read_data_sets(train_dir, fake_data=False, one_hot=False):
+def read_data_sets(train_dir, fake_data=False, one_hot=False, val_size=5000):
   class DataSets(object):
     pass
   data_sets = DataSets()
@@ -143,7 +143,7 @@ def read_data_sets(train_dir, fake_data=False, one_hot=False):
   TRAIN_LABELS = 'train-labels-idx1-ubyte.gz'
   TEST_IMAGES = 't10k-images-idx3-ubyte.gz'
   TEST_LABELS = 't10k-labels-idx1-ubyte.gz'
-  VALIDATION_SIZE = 5000
+  VALIDATION_SIZE = val_size
   local_file = maybe_download(TRAIN_IMAGES, train_dir)
   train_images = extract_images(local_file)
   local_file = maybe_download(TRAIN_LABELS, train_dir)
