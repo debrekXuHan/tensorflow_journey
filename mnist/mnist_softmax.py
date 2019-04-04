@@ -11,7 +11,7 @@ def mnist_softmax():
     W = tf.Variable(tf.zeros([784, 10]))
     b = tf.Variable(tf.zeros([10]))
 
-    y = tf.nn.softmax(tf.matmul(x, W) + b)
+    y = tf.nn.softmax(tf.matmul(x, W) + b)  # broadcasting
 
     y_ = tf.placeholder("float", [None, 10])
     cross_entropy = -tf.reduce_sum(y_ * tf.log(y))
